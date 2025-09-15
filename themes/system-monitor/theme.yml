@@ -1,0 +1,31 @@
+id: "@Charles/SystemMonitor"
+metadata:
+  displayName: "SystemMonitor"
+  description: "SystemMonitor module for Topbar"
+  author: "Charles"
+  tags: ['systemmonitor', 'toolbar']
+  appTargetVersion:
+    - 2
+    - 4
+    - 3
+styles:
+  toolbar: |
+    /* System Monitor base styles injected via theme */
+    .sm-badge {
+      font-family: system-ui, Segoe UI, Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.07);
+      color: #e6e6e6;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .sm-item { display: inline-flex; gap: 4px; align-items: center; }
+    .sm-label { opacity: 0.75; }
+    .sm-val { font-variant-numeric: tabular-nums; min-width: 32px; text-align: right; }
+    .sm-ok { color: #b7ffb7; }
+    .sm-med { color: #ffd782; }
+    .sm-high { color: #ff9c9c; }

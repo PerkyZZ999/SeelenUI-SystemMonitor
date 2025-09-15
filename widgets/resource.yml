@@ -1,0 +1,130 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Seelen-Inc/slu-lib/refs/heads/master/gen/schemas/widget.schema.json
+id: '@Charles/system-monitor'
+metadata:
+  displayName: System Monitor
+  description: CPU & GPU usage module for toolbar.
+  tags:
+    - toolbar
+    - system
+    - monitor
+  appTargetVersion:
+    - 2
+    - 4
+    - 3
+instances: Single
+settings:
+  - group:
+      - config:
+          type: input-text
+          key: metricsUrl
+          label: 'Metrics URL'
+          defaultValue: 'http://127.0.0.1:58090/metrics'
+      - config:
+          type: input-number
+          key: refreshMs
+          label: 'Refresh (ms)'
+          defaultValue: 1500
+          min: 500
+          max: 10000
+css: |
+  .sm-badge {
+    font-family: system-ui, Segoe UI, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.07);
+    color: #e6e6e6;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .sm-item { display: inline-flex; gap: 4px; align-items: center; }
+  .sm-label { opacity: 0.75; }
+  .sm-val { font-variant-numeric: tabular-nums; min-width: 32px; text-align: right; }
+  .sm-ok { color: #b7ffb7; }
+  .sm-med { color: #ffd782; }
+  .sm-high { color: #ff9c9c; }
+js: |
+  (function (global) {
+    const DEFAULT_URL = 'http://127.0.0.1:58090/metrics';
+    const DEFAULT_REFRESH = 1500;
+
+    function getConfig() {
+      try {
+        const all = global.SeelenWidgetConfig || global.__SLU_WIDGET_SETTINGS__ || {};
+        const cfg = all['@Charles/system-monitor'] || all.systemMonitor || {};
+        return {
+          metricsUrl: typeof cfg.metricsUrl === 'string' ? cfg.metricsUrl : DEFAULT_URL,
+          refreshMs: Number.isFinite(cfg.refreshMs) ? cfg.refreshMs : DEFAULT_REFRESH,
+        };
+      } catch { return { metricsUrl: DEFAULT_URL, refreshMs: DEFAULT_REFRESH }; }
+    }
+
+    function classify(val) {
+      if (val >= 80) return 'sm-high';
+      if (val >= 50) return 'sm-med';
+      return 'sm-ok';
+    }
+
+    function formatPct(v) {
+      if (v == null || isNaN(v)) return '--%';
+      return `${Math.round(v)}%`;
+    }
+
+    function createSystemMonitorItem() {
+      const { metricsUrl, refreshMs } = getConfig();
+
+      const root = document.createElement('span');
+      root.className = 'sm-badge';
+      root.title = 'System Monitor';
+
+      const cpu = document.createElement('span');
+      cpu.className = 'sm-item';
+      cpu.innerHTML = '<span class="sm-label">CPU</span> <span class="sm-val">--%</span>';
+
+      const gpu = document.createElement('span');
+      gpu.className = 'sm-item';
+      gpu.innerHTML = '<span class="sm-label">GPU</span> <span class="sm-val">--%</span>';
+
+      root.append(cpu, gpu);
+
+      async function refresh() {
+        try {
+          const res = await fetch(metricsUrl, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+
+          const cpuVal = Number(data.cpuLoad);
+          const gpuVal = Number(data.gpuLoad);
+
+          const cpuNum = cpu.querySelector('.sm-val');
+          const gpuNum = gpu.querySelector('.sm-val');
+
+          cpuNum.textContent = formatPct(cpuVal);
+          gpuNum.textContent = formatPct(gpuVal);
+
+          cpuNum.className = `sm-val ${classify(cpuVal)}`;
+          gpuNum.className = `sm-val ${classify(gpuVal)}`;
+
+          if (data.timestamp) {
+            root.title = `System Monitor\nCPU: ${formatPct(cpuVal)}\nGPU: ${formatPct(gpuVal)}\nUpdated: ${new Date(data.timestamp).toLocaleTimeString()}`;
+          }
+        } catch (e) {
+          const cpuNum = cpu.querySelector('.sm-val');
+          const gpuNum = gpu.querySelector('.sm-val');
+          if (cpuNum) { cpuNum.textContent = '--%'; cpuNum.className = 'sm-val'; }
+          if (gpuNum) { gpuNum.textContent = '--%'; gpuNum.className = 'sm-val'; }
+        }
+      }
+
+      refresh();
+      const handle = setInterval(refresh, refreshMs);
+      root.addEventListener('DOMNodeRemoved', () => clearInterval(handle), { once: true });
+
+      return root;
+    }
+
+    global.SeelenToolbarModules = global.SeelenToolbarModules || {};
+    global.SeelenToolbarModules['system-monitor'] = createSystemMonitorItem;
+  })(window);

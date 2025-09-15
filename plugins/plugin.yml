@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Seelen-Inc/slu-lib/master/gen/schemas/plugin.schema.json
+id: '@Charles/system-monitor'
+metadata:
+  displayName: System Monitor
+  description: CPU & GPU usage module for toolbar.
+  tags: [toolbar, system, monitor]
+  appTargetVersion: [2, 4, 3]
+
+target: '@seelen/fancy-toolbar'
+plugin:
+  type: text
+  id: 'system-monitor'
+  remoteData:
+    metrics:
+      url: 'http://127.0.0.1:58090/metrics?gpuz=1'
+      updateIntervalSeconds: 2
+  template: >-
+    return (metrics && metrics.cpuLoad!=null && metrics.gpuLoad!=null)
+      ? ("CPU " + (((metrics.cpuLoad<0?0:(metrics.cpuLoad>100?100:metrics.cpuLoad))|0)) + "%   GPU " + (((metrics.gpuLoad<0?0:(metrics.gpuLoad>100?100:metrics.gpuLoad))|0)) + "%")
+      : "CPU --%   GPU --%"
+  style:
+    display: 'inline-flex'
+    alignItems: 'center'
+    color: '#e6e6e6'
+    whiteSpace: 'pre'
+    fontWeight: 600
+    fontSize: 12
