@@ -1,10 +1,9 @@
 # Seelen UI System Monitor (CPU/GPU)
 
-Small, local .NET 8 service that exposes CPU and GPU usage as JSON and a Seelen UI toolbar module that displays the values in real time.
-
 ## PREVIEW
 <img width="139" height="36" alt="Preview" src="https://github.com/user-attachments/assets/540cd5e2-1471-4b26-b1a6-a45893a2c31c" />
 
+Small, local .NET 8 service that exposes CPU and GPU usage as JSON and a Seelen UI toolbar module that displays the values in real time.
 
 - Backend: `SysMonitor_App` (ASP.NET Minimal API on `http://127.0.0.1:58090`)
 - Toolbar module: `plugins/plugin.yml` (Text toolbar item with remoteData)
@@ -162,4 +161,5 @@ themes/
 
 ## License
 MIT (for this project). GPU‑Z is owned by TechPowerUp; respect their license/terms when using GPU‑Z.
+
 
