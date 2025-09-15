@@ -15,6 +15,23 @@ Small, local .NET 8 service that exposes CPU and GPU usage as JSON and a Seelen 
 - Jitter smoothing and short “hold last” windows to avoid zero spikes during sensor table rebuilds
 - CORS enabled (GET only) so Seelen’s WebView can fetch metrics
 
+## Why a small backend is required
+Seelen UI widgets/plugins run inside a sandboxed WebView. They don’t have direct access to native Windows APIs (PDH/Performance Counters, WMI), shared memory (GPU‑Z), or vendor-specific libraries. The toolbar items API is intentionally simple: fetch data via HTTP (`remoteData`) and render it with a math/template expression.
+
+To obtain accurate CPU/GPU load you need native access:
+- Windows PDH “GPU Engine” counters
+- LibreHardwareMonitor sensors
+- GPU‑Z shared memory (when available)
+
+Because those are not exposed to widgets, this project includes a tiny local .NET service that reads the sensors and exposes them as JSON for the widget to fetch. An alternative would be adding a new native capability to Seelen itself; until then, a local service is the simplest, robust approach.
+
+References:
+- Library overview: https://seelen.io/docs/library
+- API: https://seelen.io/docs/library/api
+- Types: https://seelen.io/docs/library/types
+- Plugin schema: https://github.com/Seelen-Inc/slu-lib/blob/master/gen/schemas/plugin.schema.json
+- Toolbar items schema: https://github.com/Seelen-Inc/slu-lib/blob/master/gen/schemas/toolbar_items.schema.json
+
 ## JSON API
 - Base URL: `http://127.0.0.1:58090`
 - Endpoints:
