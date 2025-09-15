@@ -1,8 +1,5 @@
 # Seelen UI System Monitor (CPU/GPU)
 
-## PREVIEW
-<img width="139" height="36" alt="Preview" src="https://github.com/user-attachments/assets/540cd5e2-1471-4b26-b1a6-a45893a2c31c" />
-
 Small, local .NET 8 service that exposes CPU and GPU usage as JSON and a Seelen UI toolbar module that displays the values in real time.
 
 - Backend: `SysMonitor_App` (ASP.NET Minimal API on `http://127.0.0.1:58090`)
@@ -74,7 +71,7 @@ Seelen reads resources from your user data folder. Place files directly under th
   - Copy `plugins/plugin.yml` to:
     - `C:\Users\<YOU>\AppData\Roaming\com.seelen.seelen-ui\plugins\plugin.yml`
 - Widgets (optional; kept for reference)
-  - Copy `widgets/system-monitor/resource.yml` to:
+  - Copy `widgets/resource.yml` to:
     - `C:\Users\<YOU>\AppData\Roaming\com.seelen.seelen-ui\widgets\resource.yml`
 - Themes (optional styling)
   - Copy the folder `themes/system-monitor` into:
@@ -148,8 +145,7 @@ SysMonitor_App/                 # .NET 8 minimal API (SeelenMetrics.exe)
 plugins/
   plugin.yml                    # Toolbar item bound to Fancy Toolbar
 widgets/
-  system-monitor/
-    resource.yml                # Widget (optional) that registers a DOM badge
+  resource.yml                  # Schema-based widget (single-file)
 themes/
   system-monitor/
     theme.yml                   # Optional toolbar styles
@@ -161,5 +157,3 @@ themes/
 
 ## License
 MIT (for this project). GPU‑Z is owned by TechPowerUp; respect their license/terms when using GPU‑Z.
-
-
